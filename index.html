@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#f5f1e9"><meta name="description" content="輸入出生日期與時間，看看累計生存時間與推估呼吸次數。"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="default"><meta name="apple-mobile-web-app-title" content="我活了多久"><link rel="manifest" href="manifest.webmanifest"><link rel="apple-touch-icon" href="icons/icon-192.png"><link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png"><title>我活了多久？</title>
+<style>
+:root{--paper:#f5f1e9;--ink:#172a35;--muted:#738087;--line:#d9ddd7;--teal:#176c69;--coral:#e07c61;--white:#fffefa}
+*{box-sizing:border-box}body{margin:0;background:var(--paper);color:var(--ink);font-family:Inter,"Noto Sans TC","Microsoft JhengHei",sans-serif;min-height:100vh;display:grid;place-items:center;padding:34px 20px}
+main{width:min(100%,760px)}.topline{display:flex;align-items:center;gap:10px;color:var(--teal);font-size:12px;letter-spacing:.16em;font-weight:700;text-transform:uppercase}.dot{width:8px;height:8px;background:var(--coral);border-radius:50%;box-shadow:0 0 0 5px #e07c6120}
+h1{font-size:clamp(36px,7vw,58px);letter-spacing:-.055em;line-height:1.08;margin:19px 0 10px} .intro{color:var(--muted);font-size:15px;margin:0 0 30px}
+.card{background:var(--white);border:1px solid #e8e7df;border-radius:22px;padding:26px;box-shadow:0 18px 55px #24343c0c}
+form{display:grid;grid-template-columns:1fr 1fr auto;align-items:end;gap:14px}.field label{display:block;font-size:12px;font-weight:700;color:#52636a;margin:0 0 8px}.field input{width:100%;height:48px;border:1px solid var(--line);border-radius:11px;padding:0 13px;background:#fff;color:var(--ink);font:inherit;outline:none}.field input:focus{border-color:var(--teal);box-shadow:0 0 0 3px #176c691c}button{height:48px;padding:0 20px;border:0;border-radius:11px;background:var(--teal);color:white;font:inherit;font-weight:700;cursor:pointer;transition:transform .15s,background .15s}button:hover{background:#115957;transform:translateY(-1px)}
+#error{min-height:20px;margin:10px 2px 0;color:#b44d3d;font-size:13px}.results{display:grid;gap:12px;margin-top:8px}.result{border-radius:17px;padding:21px 22px;background:#f2f5f1}.result.breath{background:#f8f1e9}.result-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px}.label{font-size:13px;font-weight:700;display:flex;align-items:center;gap:9px}.icon{display:grid;place-items:center;width:29px;height:29px;border-radius:9px;background:#176c6915;color:var(--teal);font-size:15px}.breath .icon{background:#e07c611b;color:#bb6048}.live{font-size:10px;color:var(--teal);font-weight:700;letter-spacing:.1em}.live:before{content:"";display:inline-block;width:6px;height:6px;margin:0 6px 1px 0;border-radius:50%;background:#42a58a;animation:pulse 1.5s infinite}@keyframes pulse{50%{opacity:.35}}.install-btn{display:none;height:34px;padding:0 13px;border:1px solid #176c6940;border-radius:10px;background:#fffefa;color:#176c69;font:inherit;font-size:12px;font-weight:700;cursor:pointer}.install-btn:hover{background:#e8f1ee}
+.time{display:flex;flex-wrap:wrap;gap:7px 17px;align-items:baseline}.unit{display:flex;gap:5px;align-items:baseline}.num{font-variant-numeric:tabular-nums;font-size:clamp(25px,5vw,39px);font-weight:650;letter-spacing:-.045em;line-height:1}.unit-label{font-size:12px;color:var(--muted)}
+.big-number{font-variant-numeric:tabular-nums;font-weight:650;letter-spacing:-.045em;font-size:clamp(31px,6vw,45px);line-height:1.1}.sub{font-size:12px;color:var(--muted);margin-top:8px}.note{font-size:11px;color:#87918f;line-height:1.7;margin:17px 4px 0}.footer{margin-top:17px;text-align:center;font-size:11px;color:#929b98}
+@media(max-width:620px){body{padding:25px 15px}.card{padding:19px 16px}form{grid-template-columns:1fr 1fr}.field:first-child{grid-column:1/-1}button{grid-column:1/-1}.result{padding:18px 16px}.time{gap:12px 13px}}
+</style></head>
+<body><main>
+<div class="topline"><span><span class="dot"></span> YOUR LIFE, IN REAL TIME</span><button class="install-btn" id="installBtn" type="button">安裝 App</button></div>
+<h1>我活了多久？</h1><p class="intro">從一個重要的時刻開始，看看生命已經走過多少時間。</p>
+<section class="card">
+<form id="form"><div class="field"><label for="birthDate">出生日期</label><input id="birthDate" type="date" required></div><div class="field"><label for="birthTime">出生時間</label><input id="birthTime" type="time" step="1" value="00:00:00" required></div><button type="submit">開始計時　↗</button></form>
+<div id="error" role="status" aria-live="polite"></div>
+<div class="results" aria-live="polite">
+<section class="result"><div class="result-head"><div class="label"><span class="icon">◷</span>累計生存時間</div><span class="live">LIVE</span></div><div id="elapsed" class="time"><span class="unit"><span class="num">—</span><span class="unit-label">年</span></span><span class="unit"><span class="num">—</span><span class="unit-label">月</span></span><span class="unit"><span class="num">—</span><span class="unit-label">日</span></span><span class="unit"><span class="num">—</span><span class="unit-label">時</span></span><span class="unit"><span class="num">—</span><span class="unit-label">分</span></span><span class="unit"><span class="num">—</span><span class="unit-label">秒</span></span></div></section>
+<section class="result breath"><div class="result-head"><div class="label"><span class="icon">〰</span>推估累計呼吸</div><span class="live">ESTIMATE</span></div><div id="breaths" class="big-number">— 次</div><div id="breathSub" class="sub">依年齡階段的平均每日呼吸次數推估</div></section></div>
+<p class="note">呼吸數為估算值，依年齡區間採用平均每日呼吸頻率，並按各階段實際經過的天數累計。個人呼吸頻率會因活動、健康狀況等因素而不同。</p>
+</section><div class="footer">每一秒，都算數。<br>手機安裝：開啟瀏覽器選單，選擇「加入主畫面」</div>
+</main>
+<script>
+const form=document.querySelector('#form'), dateInput=document.querySelector('#birthDate'), timeInput=document.querySelector('#birthTime'), errorEl=document.querySelector('#error');
+let birth=null, ticker=null;
+function makeDate(y,m,d,h=0,mi=0,s=0){return new Date(y,m,d,h,mi,s,0)}
+function addYears(date,n){const y=date.getFullYear()+n,m=date.getMonth(),d=date.getDate();const last=new Date(y,m+1,0).getDate();return makeDate(y,m,Math.min(d,last),date.getHours(),date.getMinutes(),date.getSeconds())}
+function addMonths(date,n){const total=date.getMonth()+n,y=date.getFullYear()+Math.floor(total/12),m=((total%12)+12)%12,d=date.getDate();return makeDate(y,m,Math.min(d,new Date(y,m+1,0).getDate()),date.getHours(),date.getMinutes(),date.getSeconds())}
+function duration(from,to){let years=to.getFullYear()-from.getFullYear();while(years>0&&addYears(from,years)>to)years--;let anchor=addYears(from,years),months=0;while(months<11&&addMonths(anchor,months+1)<=to)months++;anchor=addMonths(anchor,months);let rest=Math.floor((to-anchor)/1000),days=Math.floor(rest/86400);rest-=days*86400;const hours=Math.floor(rest/3600);rest-=hours*3600;const minutes=Math.floor(rest/60),seconds=rest-minutes*60;return [years,months,days,hours,minutes,seconds]}
+const stages=[{age:0,rate:40},{age:1,rate:30},{age:3,rate:24},{age:6,rate:20},{age:12,rate:18},{age:18,rate:16}];
+function breathCount(from,to){let total=0;for(let i=0;i<stages.length;i++){const start=i===0?from:addYears(from,stages[i].age),end=i+1<stages.length?addYears(from,stages[i+1].age):to;const a=Math.max(from,start),b=Math.min(to,end);if(b>a)total+=(b-a)/86400000*stages[i].rate}return Math.round(total)}
+const fmt=new Intl.NumberFormat('zh-TW');
+function render(){if(!birth)return;const now=new Date(),parts=duration(birth,now);document.querySelector('#elapsed').innerHTML=parts.map((v,i)=>`<span class="unit"><span class="num">${fmt.format(v)}</span><span class="unit-label">${['年','月','日','時','分','秒'][i]}</span></span>`).join('');document.querySelector('#breaths').textContent=fmt.format(breathCount(birth,now))+' 次';document.querySelector('#breathSub').textContent=`以各年齡階段平均值推估 · 已經過 ${fmt.format(Math.floor((now-birth)/86400000))} 天`}
+form.addEventListener('submit',e=>{e.preventDefault();const [y,m,d]=dateInput.value.split('-').map(Number),[h=0,mi=0,s=0]=timeInput.value.split(':').map(Number);if(!y){errorEl.textContent='請先選擇出生日期。';return}const candidate=makeDate(y,m-1,d,h,mi,s);if(candidate.getTime()>Date.now()){errorEl.textContent='出生日期與時間不能晚於現在。';return}birth=candidate;errorEl.textContent='';if(ticker)clearInterval(ticker);render();ticker=setInterval(render,1000)});
+const installBtn=document.querySelector('#installBtn');let deferredInstall=null;
+window.addEventListener('beforeinstallprompt',event=>{event.preventDefault();deferredInstall=event;installBtn.style.display='inline-block'});
+installBtn.addEventListener('click',async()=>{if(!deferredInstall)return;deferredInstall.prompt();await deferredInstall.userChoice;deferredInstall=null;installBtn.style.display='none'});
+window.addEventListener('appinstalled',()=>{installBtn.style.display='none'});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('./sw.js').catch(()=>{}));</script></body></html>
+
